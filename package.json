@@ -1,0 +1,9 @@
+{
+  "name": "pubsub-subscribers",
+  "version": "1.0.0",
+  "description": "Subscribers for RabbitMQ pub/sub",
+  "type": "commonjs",
+  "dependencies": {
+    "amqplib": "^0.10.9"
+  }
+}

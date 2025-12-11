@@ -1,0 +1,49 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - pubsub_net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  api:
+    build: ./api
+    container_name: publisher_api
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - pubsub_net
+
+  subscriber_email:
+    build: .
+    container_name: subscriber_email
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pubsub_net
+    command: ["node", "subscriber_email.js"]
+
+  subscriber_log:
+    build: .
+    container_name: subscriber_log
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pubsub_net
+    command: ["node", "subscriber_log.js"]
+
+networks:
+  pubsub_net:
+    driver: bridge
